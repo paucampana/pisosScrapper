@@ -31,6 +31,7 @@ def sendResults():
 
 def get_house_from_html_pisos(soup, url):
     print("hello")
+    print(soup)
     titulo = scraping.get_string_from_class(soup, "h1", 'property-title')
     zona = scraping.get_string_from_id(soup, "span", 'ctl00_content1_PaginationTop_breadcrumbclassic_lbl_LocalizationUpperLevelwithLink')
     precio = scraping.delete_point_from_text(scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'priceContainer')))
@@ -70,6 +71,7 @@ def get_houses(url):
     refresh_retries = 1
     while(refresh_retries > 0):
         try:
+            chrome_options = config.get_Chrome_Options()
             driver = webdriver.Chrome(options=chrome_options)
             driver.set_page_load_timeout(15)
             driver.get(url)
@@ -88,13 +90,12 @@ def get_houses(url):
 
 def get_set_house(urls):
     if config.TEST_MODE:
-        new_urls = []
-        new_urls = new_urls.append(urls[0])
-        urls = new_urls
+        urls = [urls[0]]
 
     max_workers = config.MAX_WORKERS
     houses = []
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
+        print(urls)
         results = executor.map(get_houses, urls)
         for url, house, e in results:
             if e is None:
@@ -116,16 +117,7 @@ def write_csv(houses):
     return;
 
 
-WINDOW_SIZE = "1920,1080"
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_experimental_option("prefs", {'profile.managed_default_content_settings.images':2})
-chrome_options.add_argument("--remote-debugin-port=9222")
-chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
-if privateConfig.PathNeeded:
-    chrome_options.binary_location = privateConfig.ChromeDriverPath
+
 
 filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
