@@ -1,6 +1,5 @@
 def get_string_from_class (soup, tagName, className):
     result = soup.find(tagName,attrs={'class':className})
-    print(result)
     result = get_text(result)
     return result;
 
@@ -62,10 +61,6 @@ def get_all_elements_ul_by_id (soup, tagName, idName):
     return ', '.join(result);
 
 
-
-def delete_point_from_text(text):
-    result = text.replace(".", "")
-    return result
 
 def get_last_string(text):
     result = text.split()[2]
