@@ -67,15 +67,18 @@ def get_houses(url):
     refresh_retries = 3
     while(refresh_retries > 0):
         try:
-            driver = webdriver.Chrome(chrome_options=chrome_options)
+
+            driver = webdriver.Chrome(options=chrome_options,executable_path="/usr/local/bin/chromedriver")
             driver.set_page_load_timeout(15)
             driver.get(url)
+
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             myhouse = get_house_from_html_fotocasa(soup, url)
             driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
             return url, myhouse, None
         except Exception as e:
+            print(e)
             refresh_retries -= 1
             if refresh_retries <= 0:
                 return url, None, e
@@ -114,6 +117,7 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_experimental_option("prefs", {'profile.managed_default_content_settings.images':2})
 chrome_options.add_argument("--remote-debugin-port=9222")
 chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
+chrome_options.binary_location = "/usr/local/bin/chromedriver"
 
 
 url_fotocasa = "https://www.pisos.com"
