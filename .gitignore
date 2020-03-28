@@ -5,3 +5,6 @@ app/src/excels/*
 __pycache__/
 *.py[cod]
 *$py.class
+
+# exclude config
+app/src/privateConfig.py
