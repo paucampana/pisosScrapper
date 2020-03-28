@@ -140,31 +140,25 @@ with open(filePath, 'w') as f:
 
 
 
-page = 0
-safe_finish = 1 #Numbers of pages that need to have 0 links to finish searching
+page = 1
 continue_searching = True
+main_links =  [] ## avoid being redirected to first page
 while continue_searching:
     links = []
     r  = requests.get(url_fotocasa + url_start + str(page) + url_end)
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
     data_all_houses = soup.findAll('div',attrs={'itemtype':'http://schema.org/SingleFamilyResidence'})
-    #url_link = data_all_houses[0].find_all('div',attrs={'class':['row', 'destacado', 'clearfix']})
-    #print('AAAAAAAAAAAAAAAAAAAAAAAAA' + str(url_link))
     for data_house in data_all_houses:
         meta_tag = data_house.find('meta',attrs={'itemprop':'url'})
         link = meta_tag.attrs['content']
         if link is not None:
             links.append(url_fotocasa + link)
     print("found: " + str(len(links)) + " in page: " + str(page))
-    if len(links) == 0:
-        safe_finish -= 1
-        if safe_finish <= 0:
-            continue_searching = False
-    else:
-        ##get_set_house(links)
-        safe_finish = 3
+    if links == main_links:
+        continue_searching = False
+    if page == 1:
+        main_links = links
+    get_set_house(links)
     page += 1;
-    continue_searching = False
-
 #sendResults()
