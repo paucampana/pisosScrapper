@@ -4,6 +4,8 @@ from selenium import webdriver
 import scraping
 import sendMail
 import requests
+import config
+import privateConfig
 import csv
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
@@ -27,7 +29,8 @@ def sendResults():
 
 
 
-def get_house_from_html_fotocasa(soup, url):
+def get_house_from_html_pisos(soup, url):
+    print("hello")
     titulo = scraping.get_string_from_class(soup, "h1", 'property-title')
     zona = scraping.get_string_from_id(soup, "span", 'ctl00_content1_PaginationTop_breadcrumbclassic_lbl_LocalizationUpperLevelwithLink')
     precio = scraping.delete_point_from_text(scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'priceContainer')))
@@ -64,16 +67,15 @@ def get_house_from_html_fotocasa(soup, url):
 
 
 def get_houses(url):
-    refresh_retries = 3
+    refresh_retries = 1
     while(refresh_retries > 0):
         try:
-
-            driver = webdriver.Chrome(options=chrome_options,executable_path="/usr/local/bin/chromedriver")
+            driver = webdriver.Chrome(options=chrome_options)
             driver.set_page_load_timeout(15)
             driver.get(url)
 
             soup = BeautifulSoup(driver.page_source, 'html.parser')
-            myhouse = get_house_from_html_fotocasa(soup, url)
+            myhouse = get_house_from_html_pisos(soup, url)
             driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
             return url, myhouse, None
@@ -85,7 +87,12 @@ def get_houses(url):
 
 
 def get_set_house(urls):
-    max_workers = 5
+    if config.TEST_MODE:
+        new_urls = []
+        new_urls = new_urls.append(urls[0])
+        urls = new_urls
+
+    max_workers = config.MAX_WORKERS
     houses = []
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
         results = executor.map(get_houses, urls)
@@ -117,14 +124,9 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_experimental_option("prefs", {'profile.managed_default_content_settings.images':2})
 chrome_options.add_argument("--remote-debugin-port=9222")
 chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
-chrome_options.binary_location = "/usr/local/bin/chromedriver"
+if privateConfig.PathNeeded:
+    chrome_options.binary_location = privateConfig.ChromeDriverPath
 
-
-url_fotocasa = "https://www.pisos.com"
-# url_start = "/es/alquiler/casas/barcelona-capital/todas-las-zonas/l/"
-# url_end = "?combinedLocationIds=724,9,8,232,376,8019,0,0,0"
-url_start = "/venta/pisos-esparreguera/"
-url_end = ""
 filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 simple_date = datetime.now().strftime('%Y/%m/%d')
@@ -149,7 +151,7 @@ continue_searching = True
 main_links =  [] ## avoid being redirected to first page
 while continue_searching:
     links = []
-    r  = requests.get(url_fotocasa + url_start + str(page) + url_end)
+    r  = requests.get(config.URL_PISOS + config.URL_PLACE + str(page))
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
     data_all_houses = soup.findAll('div',attrs={'itemtype':'http://schema.org/SingleFamilyResidence'})
@@ -157,7 +159,7 @@ while continue_searching:
         meta_tag = data_house.find('meta',attrs={'itemprop':'url'})
         link = meta_tag.attrs['content']
         if link is not None:
-            links.append(url_fotocasa + link)
+            links.append(config.URL_PISOS + link)
     print("found: " + str(len(links)) + " in page: " + str(page))
     if links == main_links:
         continue_searching = False
@@ -165,4 +167,7 @@ while continue_searching:
         main_links = links
     get_set_house(links)
     page += 1;
+
+    if config.TEST_MODE:
+        continue_searching = False
 #sendResults()
