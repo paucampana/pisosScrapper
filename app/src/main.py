@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from House import House
 from bs4 import BeautifulSoup
 from selenium import webdriver 
