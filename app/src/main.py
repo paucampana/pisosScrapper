@@ -149,7 +149,7 @@ while continue_searching:
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
     data_all_houses = soup.findAll('div',attrs={'itemtype':'http://schema.org/SingleFamilyResidence'})
-    print(data_all_houses[0].find('data-navigate-ref'))
+    print(data_all_houses[0].find('meta',attrs={'itemprop':'url'}))
     for data_house in data_all_houses:
         link = data_house.find('a')
         if link is not None:
@@ -163,6 +163,7 @@ while continue_searching:
         ##get_set_house(links)  
         safe_finish = 3     
     page += 1;
+    continue_searching = False
 
 #sendResults()
 
