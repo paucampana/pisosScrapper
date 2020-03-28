@@ -30,9 +30,12 @@ def sendResults():
 
 
 def get_house_from_html_pisos(soup, url):
+    #print(soup.encode('utf-8'))  
     print("hello")
-    print(soup)
-    titulo = scraping.get_string_from_class(soup, "h1", 'property-title')
+    titulo = scraping.get_string_from_class(soup, "h1", 'title')
+    #titulo = scraping.get_string_from_class(soup, "h1", 're-DetailHeader-propertyTitle')
+    print("titulo " + titulo)
+
     zona = scraping.get_string_from_id(soup, "span", 'ctl00_content1_PaginationTop_breadcrumbclassic_lbl_LocalizationUpperLevelwithLink')
     precio = scraping.delete_point_from_text(scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'priceContainer')))
     num_hab = scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'litRooms'))
@@ -73,7 +76,7 @@ def get_houses(url):
         try:
             chrome_options = config.get_Chrome_Options()
             driver = webdriver.Chrome(options=chrome_options)
-            driver.set_page_load_timeout(15)
+            driver.set_page_load_timeout(10)
             driver.get(url)
 
             soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -90,7 +93,7 @@ def get_houses(url):
 
 def get_set_house(urls):
     if config.TEST_MODE:
-        urls = [urls[0]]
+        urls = [urls[10]]
 
     max_workers = config.MAX_WORKERS
     houses = []

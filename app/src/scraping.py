@@ -1,5 +1,6 @@
 def get_string_from_class (soup, tagName, className):
     result = soup.find(tagName,attrs={'class':className})
+    print(result)
     result = get_text(result)
     return result;
 
