@@ -138,7 +138,7 @@ with open(filePath, 'w') as f:
 
 
 
-
+        
 
 page = 0
 safe_finish = 1 #Numbers of pages that need to have 0 links to finish searching
@@ -148,8 +148,8 @@ while continue_searching:
     r  = requests.get(url_fotocasa + url_start + str(page) + url_end)
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
-    print(data)
-    data_all_houses = soup.findAll('div',attrs={'class':'re-Searchresult-itemRow'})
+    data_all_houses = soup.findAll('div',attrs={'itemtype':'http://schema.org/SingleFamilyResidence'})
+    print(data_all_houses[0].find('data-navigate-ref'))
     for data_house in data_all_houses:
         link = data_house.find('a')
         if link is not None:
@@ -160,7 +160,7 @@ while continue_searching:
         if safe_finish <= 0:
             continue_searching = False
     else:
-        get_set_house(links)  
+        ##get_set_house(links)  
         safe_finish = 3     
     page += 1;
 
