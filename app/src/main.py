@@ -1,6 +1,6 @@
 from House import House
 from bs4 import BeautifulSoup
-from selenium import webdriver 
+from selenium import webdriver
 import scraping
 import sendMail
 import requests
@@ -40,7 +40,7 @@ def get_house_from_html_fotocasa(soup, url):
         contacto = scraping.string_one_line(scraping.get_string_from_id(soup, "div", 'ctl00_ucInfoRequestGeneric_divAdvertisement'))
     contacto_tel = scraping.get_input_value_from_id(soup, "input", 'hid_AdPhone')
     if contacto_tel != "":
-        contacto_tel= contacto_tel.split(":")[-1] 
+        contacto_tel= contacto_tel.split(":")[-1]
     contacto_extra = scraping.string_one_line(scraping.get_string_from_class_last(soup, "div", 'agency-contact-container'))
     caracteristicas = scraping.get_all_elements_ul(soup, "ul", "detail-caracteristics--list")
     extras = scraping.get_all_elements_ul(soup, "ul", "detail-extras")
@@ -58,7 +58,7 @@ def get_house_from_html_fotocasa(soup, url):
 
     ubicacion = scraping.get_string_from_class_last(soup, "div", 'detail-section-content')
     descripcion = scraping.delete_empty_lines(scraping.get_string_from_class(soup, "p", 'detail-description'))
-    res_house = House(titulo, zona, precio, num_hab, num_bano, metro_q, num_planta, 
+    res_house = House(titulo, zona, precio, num_hab, num_bano, metro_q, num_planta,
                       contacto, contacto_tel, contacto_extra, caracteristicas, extras, ubicacion, descripcion, images, referenciaFotocasa, url)
     return res_house;
 
@@ -67,18 +67,18 @@ def get_houses(url):
     refresh_retries = 3
     while(refresh_retries > 0):
         try:
-            driver = webdriver.Chrome(chrome_options=chrome_options)  
+            driver = webdriver.Chrome(chrome_options=chrome_options)
             driver.set_page_load_timeout(15)
             driver.get(url)
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             myhouse = get_house_from_html_fotocasa(soup, url)
-            driver.close() ##If all are closed, try with driver.close() 
+            driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
             return url, myhouse, None
         except Exception as e:
             refresh_retries -= 1
-            if refresh_retries <= 0:    
-                return url, None, e  
+            if refresh_retries <= 0:
+                return url, None, e
 
 
 def get_set_house(urls):
@@ -91,8 +91,8 @@ def get_set_house(urls):
                 houses.append(house)
             else:
                 print("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
-            
-            
+
+
     write_csv(houses)
     return;
 
@@ -107,8 +107,8 @@ def write_csv(houses):
 
 
 WINDOW_SIZE = "1920,1080"
-chrome_options = Options()  
-chrome_options.add_argument("--headless")  
+chrome_options = Options()
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_experimental_option("prefs", {'profile.managed_default_content_settings.images':2})
@@ -123,12 +123,12 @@ url_start = "/venta/pisos-esparreguera/"
 url_end = ""
 filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
-simple_date = datetime.now().strftime('%Y/%m/%d') 
+simple_date = datetime.now().strftime('%Y/%m/%d')
 csv.register_dialect('myDialect',
 quoting=csv.QUOTE_ALL,
 skipinitialspace=True)
-first_row = ["Zona", "Precio (€/mes)", "Habitaciones", "Baños", "Metros cuadrados", "Planta", 
-             "Ubicación", "Caracteristicas", "Extras", "Contacto", "Telefono", "Detalles contacto",  
+first_row = ["Zona", "Precio (€/mes)", "Habitaciones", "Baños", "Metros cuadrados", "Planta",
+             "Ubicación", "Caracteristicas", "Extras", "Contacto", "Telefono", "Detalles contacto",
              "Descripcion", "Imagenes",  "ref. Fotocasa","url"]
 with open(filePath, 'w') as f:
         writer = csv.writer(f, dialect='myDialect')
@@ -138,38 +138,32 @@ with open(filePath, 'w') as f:
 
 
 
-        
+
 
 page = 0
 safe_finish = 1 #Numbers of pages that need to have 0 links to finish searching
 continue_searching = True
 while continue_searching:
-    links = []  
+    links = []
     r  = requests.get(url_fotocasa + url_start + str(page) + url_end)
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
     data_all_houses = soup.findAll('div',attrs={'itemtype':'http://schema.org/SingleFamilyResidence'})
-    print(data_all_houses[0].find('data-navigate-ref'))
+    #url_link = data_all_houses[0].find_all('div',attrs={'class':['row', 'destacado', 'clearfix']})
+    #print('AAAAAAAAAAAAAAAAAAAAAAAAA' + str(url_link))
     for data_house in data_all_houses:
-        link = data_house.find('a')
+        meta_tag = data_house.find('meta',attrs={'itemprop':'url'})
+        link = meta_tag.attrs['content']
         if link is not None:
-            links.append(url_fotocasa + link['href'])
+            links.append(url_fotocasa + link)
     print("found: " + str(len(links)) + " in page: " + str(page))
     if len(links) == 0:
         safe_finish -= 1
         if safe_finish <= 0:
             continue_searching = False
     else:
-        ##get_set_house(links)  
-        safe_finish = 3     
+        ##get_set_house(links)
+        safe_finish = 3
     page += 1;
 
 #sendResults()
-
-
-
-
-
-
-
-
