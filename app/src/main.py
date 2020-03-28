@@ -122,8 +122,9 @@ url_fotocasa = "https://www.fotocasa.es"
 # url_end = "?combinedLocationIds=724,9,8,232,376,8019,0,0,0"
 url_start = "/es/alquiler/casas/barcelona-provincia/baix-llobregat-nord/l/"
 url_end = ""
-filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H:%M:%S') + ".csv"
-fileName = datetime.now().strftime('%Y-%m-%d--%H:%M:%S') + ".csv"
+date =  datetime.now()
+filePath = "excels/" + date.strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
+fileName = date.strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 simple_date = datetime.now().strftime('%Y/%m/%d') 
 csv.register_dialect('myDialect',
 quoting=csv.QUOTE_ALL,
