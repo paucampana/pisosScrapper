@@ -165,5 +165,6 @@ while continue_searching:
         ##get_set_house(links)
         safe_finish = 3
     page += 1;
+    continue_searching = False
 
 #sendResults()
