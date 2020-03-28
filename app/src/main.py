@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from House import House
 from bs4 import BeautifulSoup
 from selenium import webdriver 
@@ -117,14 +116,13 @@ chrome_options.add_argument("--remote-debugin-port=9222")
 chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
 
 
-url_fotocasa = "https://www.fotocasa.es"
+url_fotocasa = "https://www.pisos.com"
 # url_start = "/es/alquiler/casas/barcelona-capital/todas-las-zonas/l/"
 # url_end = "?combinedLocationIds=724,9,8,232,376,8019,0,0,0"
-url_start = "/es/alquiler/casas/barcelona-provincia/baix-llobregat-nord/l/"
+url_start = "/venta/pisos-esparreguera/"
 url_end = ""
-date =  datetime.now()
-filePath = "excels/" + date.strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
-fileName = date.strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
+filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
+fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 simple_date = datetime.now().strftime('%Y/%m/%d') 
 csv.register_dialect('myDialect',
 quoting=csv.QUOTE_ALL,
@@ -143,13 +141,14 @@ with open(filePath, 'w') as f:
 
 
 page = 0
-safe_finish = 3 #Numbers of pages that need to have 0 links to finish searching
+safe_finish = 1 #Numbers of pages that need to have 0 links to finish searching
 continue_searching = True
 while continue_searching:
     links = []  
     r  = requests.get(url_fotocasa + url_start + str(page) + url_end)
     data = r.text
     soup = BeautifulSoup(data, features="html.parser")
+    print(data)
     data_all_houses = soup.findAll('div',attrs={'class':'re-Searchresult-itemRow'})
     for data_house in data_all_houses:
         link = data_house.find('a')
