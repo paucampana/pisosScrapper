@@ -33,7 +33,7 @@ def sendResults():
 
 
 def get_house_from_html_pisos(soup, url):
-    #logging.debug(soup.encode('utf-8'))  
+    #logging.debug(soup.encode('utf-8'))
 
     titulo = scraping.get_string_from_class(soup, "h1", 'title')
     logging.debug("titulo " + titulo)
@@ -99,13 +99,15 @@ def get_houses(url):
             refresh_retries = 0
             return url, myhouse, None
         except Exception as e:
+            print('EXCEPTION')
+            print(e)
             refresh_retries -= 1
             if refresh_retries <= 0:
                 return url, None, e
 
 
 def get_set_house(urls):
-    
+
     max_workers = config.MAX_WORKERS
     houses = []
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
