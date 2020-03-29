@@ -67,6 +67,43 @@ def get_house_from_html_pisos(soup, url):
 
     description = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
     logging.debug("descripcion " + description)
+    antic_icon = soup.find('span',{'class' : 'icon-antiguedad'})
+    if antic_icon is not None:
+        antic = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
+        logging.debug("antic " + antic)
+    conservacion_icon = soup.find('span',{'class' : 'icon-estadoconservacion'})
+    if conservacion_icon is not None:
+        conservacion = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
+        logging.debug("conservacion " + conservacion)
+
+    caracteristicas = soup.find_all('div', {'class' : 'charblock'})
+    print(caracteristicas)
+
+    for caracteristica in caracteristicas:
+        titol = caracteristica.find('h2', {'class': 'title'}).text
+        print(titol)
+        tags = caracteristica.find_all('li',{'class': 'charblock-element'})
+        for tag in tags:
+            info = tag.find_all('span')
+            kind = info[0].text
+            description = ""
+            if len(info) > 1:
+                description = info[1].text.replace(': ', '')
+            print(kind + '--------' + description)
+    print('AAAAAAAAAAAA')
+    ## LOCATION
+    location_info = soup.find('div',attrs={'id':'location'})#.find('div',{'class':'subtitle'})
+    print('aa')
+    print(location_info)
+    print(soup)
+
+
+
+
+
+
+
+
 
 
     num_planta = scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'litFloor'))
