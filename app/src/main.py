@@ -54,13 +54,19 @@ def get_house_from_html_pisos(soup, url):
             num_bano = divBasicData.text.replace("baño", "")
         if divBasicData.find('div',attrs={'class':'icon-superficie'}) is not None:
             metro_q = divBasicData.text.replace("m²", "")
-
+        if divBasicData.find('div',attrs={'class':'icon-planta'}) is not None:
+            planta = divBasicData.text.split()[0]
+        if divBasicData.find('div',attrs={'class':'icon-eurmetro2'}) is not None:
+            precio_m = divBasicData.text.split()[0]
     logging.debug("num_hab " + num_hab)
     logging.debug("num_bano " + num_bano)
     logging.debug("metro_q " + metro_q)
+    logging.debug("planta " + planta)
+    logging.debug("precio_m " + precio_m)
 
 
-
+    description = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
+    logging.debug("descripcion " + description)
 
 
     num_planta = scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'litFloor'))
