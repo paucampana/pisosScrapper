@@ -64,9 +64,10 @@ def get_house_from_html_pisos(soup, url):
     if conservacion_icon is not None:
         mapHouse["conservacion"] = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     caracteristicas = soup.find_all('div', {'class' : 'charblock'})
-    caracteristicas_info = ""
-    first_element = True
     for caracteristica in caracteristicas:
+        first_element = True
+        caracteristica_info = ""
+        tipoCaracteristica = scraping.get_string_from_class(caracteristica, "h2", 'title')
         tags = caracteristica.find_all('li',{'class': 'charblock-element'})
         for tag in tags:
             info = tag.find_all('span')
@@ -75,19 +76,18 @@ def get_house_from_html_pisos(soup, url):
             if len(info) > 1:
                 description = info[1].text.replace(': ', '')
             if first_element:
-                caracteristicas_info += kind + ": " + description
+                caracteristica_info += kind + ": " + description
             else: 
-                caracteristicas_info += ", " + kind + ": " + description
+                caracteristica_info += ", " + kind + ": " + description
             first_element = False
-    mapHouse['caracteristicas'] = caracteristicas_info
-    # ## LOCATION
-    # location_info = soup.find('div',attrs={'id':'location'})#.find('div',{'class':'subtitle'})
-    # print('aa')
-    # print(location_info)
-    # #print(soup)
-    # print('............')
-    logging.debug(mapHouse)
-    
+        if "Datos" in tipoCaracteristica:
+            mapHouse['dato_basicos'] = caracteristica_info
+        if "Muebles" in tipoCaracteristica:
+            mapHouse['muebles_i_acabados'] = caracteristica_info
+        if "Equipamiento" in tipoCaracteristica:
+            mapHouse['equipamiento_e_instalaciones'] = caracteristica_info
+        if "Certificado" in tipoCaracteristica:
+            mapHouse['certificado_energetico'] = caracteristica_info
     house = House(mapHouse)
     return house;
 
