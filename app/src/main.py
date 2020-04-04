@@ -9,8 +9,11 @@ import privateConfig
 import csv
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import concurrent.futures
 import logging
+import time
 import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
@@ -119,11 +122,40 @@ def get_houses(url):
             refresh_retries = 0
             return url, house_item, None
         except Exception as e:
-            print(e)
+            logging.error('EXCEPTION with url ' + url)
+            logging.error(e)
             refresh_retries -= 1
             if refresh_retries <= 0:
                 return url, None, e
 
+
+def like_house(url):
+    try:
+        chrome_options = config.get_Chrome_Options()
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.set_page_load_timeout(10)
+        driver.get(config.URL_LOG_IN)
+        driver.find_element_by_id("Email").send_keys(config.USER_PISOS)
+        driver.find_element_by_id("Password").send_keys(config.PW_PISOS)
+        driver.find_elements_by_xpath("//input[@data-id='loginButton']")[0].submit();
+        time.sleep(5)
+        #At this point we are logged in
+        driver.get(url)
+        time.sleep(5)
+        button_fav = driver.find_element_by_id("dvGuardarFavoritos").get_attribute("class")
+        print(button_fav)
+        if button_fav == "icon icon-fav selected":
+            logging.debug("already liked. Doing nothing")
+        else:
+            driver.find_element_by_id("dvGuardarFavoritos").click()
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        driver.close() ##If all are closed, try with driver.close()
+        refresh_retries = 0
+        return None
+    except Exception as e:
+        logging.error('EXCEPTION with url ' + url)
+        logging.error(e)
+        return e
 
 def get_set_house(urls):
 
@@ -179,6 +211,9 @@ with open(filePath, 'w') as f:
 page = 1
 continue_searching = True
 main_links =  [] ## avoid being redirected to first page
+
+like_house("https://www.pisos.com/comprar/piso-esparreguera_centro_urbano-97582198372_519327")
+
 while continue_searching:
     links = []
     r  = requests.get(config.URL_PISOS + config.URL_PLACE + str(page))
@@ -202,4 +237,5 @@ while continue_searching:
 
     if config.TEST_MODE:
         continue_searching = False
-sendResults()
+#sendResults()
+
