@@ -6,21 +6,21 @@ from email.utils import COMMASPACE
 from email import encoders
 
 
-FILEPATH = './excels/'
+FILEPATH = './houses_dataframe.csv'
 MY_EMAIL = 'informe.casas@gmail.com'
 MY_PASSWORD = '17InformeCasas'
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
 
-def sendMail(subject, filename, to_email):
+def sendMail(subject, to_email):
     msg = MIMEMultipart()
     msg['From'] = MY_EMAIL
     msg['To'] = COMMASPACE.join(to_email)
     msg['Subject'] = subject
 
     part = MIMEBase('application', "octet-stream")
-    part.set_payload(open(FILEPATH + filename, "rb").read())
+    part.set_payload(open(FILEPATH, "rb").read())
     encoders.encode_base64(part)
     part.add_header('Content-Disposition', 'attachment', filename=filename)
     msg.attach(part)

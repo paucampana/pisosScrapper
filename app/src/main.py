@@ -14,18 +14,19 @@ from selenium.webdriver.support.ui import WebDriverWait
 import concurrent.futures
 import logging
 import time
+import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
 
 def sendResults():
     try:
-        with open(filePath) as f:
+        with open('houses_dataframe.csv') as f:
             csv_length = sum(1 for line in f)
             logging.info("TOTAL FOUND: " + str(csv_length - 1))
             if csv_length > 1:
-                subject = "INFORME DIA " + simple_date
+                subject = "INFORME DIA " + datetime.now().strftime('%Y/%m/%d')
                 to_email = ["pau.campanya.soler@gmail.com"]
-                sendMail.sendMail(subject, fileName, to_email)
+                sendMail.sendMail(subject, to_email)
             else:
                 logging.info("EMPTY CSV. NOT SENT")
 
@@ -38,11 +39,11 @@ def sendResults():
 def get_house_from_html_pisos(soup, url):
     #logging.debug(soup.encode('utf-8'))
     mapHouse = {}
-    mapHouse["url"] = url
-    mapHouse["titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
-    mapHouse["zona"] = scraping.get_string_from_class(soup, "h2", 'position')
-    mapHouse["precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
-    
+    mapHouse["URL"] = url
+    mapHouse["Titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
+    mapHouse["Zona"] = scraping.get_string_from_class(soup, "h2", 'position')
+    mapHouse["Precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
+
     num_hab = ""
     num_bano = ""
     metro_q = ""
@@ -50,22 +51,22 @@ def get_house_from_html_pisos(soup, url):
     divBasicDatas = basicData.findAll("div")
     for divBasicData in divBasicDatas:
         if divBasicData.find('div',attrs={'class':'icon-habitaciones'}) is not None:
-            mapHouse["num_hab"] = divBasicData.text.replace("habs", "")
+            mapHouse["Habitaciones"] = divBasicData.text.replace("habs", "")
         if divBasicData.find('div',attrs={'class':'icon-banyos'}) is not None:
-            mapHouse["num_bano"] = divBasicData.text.replace("baño", "")
+            mapHouse["Aseos"] = divBasicData.text.replace("baño", "")
         if divBasicData.find('div',attrs={'class':'icon-superficie'}) is not None:
-            mapHouse["metro_q"] = divBasicData.text.replace("m²", "")
+            mapHouse["Metros cuadrados"] = divBasicData.text.replace("m²", "")
         if divBasicData.find('div',attrs={'class':'icon-planta'}) is not None:
-            mapHouse["planta"] = divBasicData.text.split()[0]
+            mapHouse["Planta"] = divBasicData.text.split()[0]
         if divBasicData.find('div',attrs={'class':'icon-eurmetro2'}) is not None:
-            mapHouse["precio_m"] = divBasicData.text.split()[0]
-    mapHouse["description"] = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
+            mapHouse["Precio (€/m²)"] = divBasicData.text.split()[0]
+    mapHouse["Description"] = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
     antic_icon = soup.find('span',{'class' : 'icon-antiguedad'})
     if antic_icon is not None:
-        mapHouse["antic"] = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
+        mapHouse["Antigüedad"] = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     conservacion_icon = soup.find('span',{'class' : 'icon-estadoconservacion'})
     if conservacion_icon is not None:
-        mapHouse["conservacion"] = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
+        mapHouse["Estado conservacion"] = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     caracteristicas = soup.find_all('div', {'class' : 'charblock'})
     for caracteristica in caracteristicas:
         first_element = True
@@ -80,19 +81,30 @@ def get_house_from_html_pisos(soup, url):
                 description = info[1].text.replace(': ', '')
             if first_element:
                 caracteristica_info += kind + ": " + description
-            else: 
+            else:
                 caracteristica_info += ", " + kind + ": " + description
             first_element = False
         if "Datos" in tipoCaracteristica:
-            mapHouse['dato_basicos'] = caracteristica_info
+            mapHouse['Caracteristicas'] = caracteristica_info
         if "Muebles" in tipoCaracteristica:
-            mapHouse['muebles_i_acabados'] = caracteristica_info
+            mapHouse['Muebles y acabados'] = caracteristica_info
         if "Equipamiento" in tipoCaracteristica:
-            mapHouse['equipamiento_e_instalaciones'] = caracteristica_info
+            mapHouse['Equipamiento e instalaciones'] = caracteristica_info
         if "Certificado" in tipoCaracteristica:
-            mapHouse['certificado_energetico'] = caracteristica_info
-    house = House(mapHouse)
-    return house;
+            mapHouse['Certificado energetico'] = caracteristica_info
+    #house = House(mapHouse)
+    house_item = pd.Series(mapHouse)
+    """
+    house_item = [{'Titulo': mapHouse['titulo'], 'Zona': mapHouse['zona'], 'Precio': mapHouse['precio'],
+                 'Habitaciones': mapHouse['num_hab'], 'Aseos': mapHouse['num_bano'], 'Metros cuadrados': mapHouse['metro_q'],
+                 "Planta": mapHouse['planta'], "Precio (€/m²)": mapHouse['precio_m'], "Description": mapHouse['description'],
+                 "Estado conservacion": mapHouse['conservacion'], "Caracteristicas": mapHouse['caracteristicas'],
+                 "Muebles y acabados": mapHouse['muebles_i_acabados'], "Equipamiento e instalaciones":mapHouse['equipamiento_e_instalaciones'],
+                 "Certificado energetico": mapHouse['certificado_energetico'],"URL": mapHouse['url']}]
+    """
+    logging.info('HOUSE_ITEM')
+    logging.info(house_item)
+    return house_item;
 
 
 def get_houses(url):
@@ -105,10 +117,10 @@ def get_houses(url):
             driver.get(url)
 
             soup = BeautifulSoup(driver.page_source, 'html.parser')
-            myhouse = get_house_from_html_pisos(soup, url)
+            house_item = get_house_from_html_pisos(soup, url)
             driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
-            return url, myhouse, None
+            return url, house_item, None
         except Exception as e:
             logging.error('EXCEPTION with url ' + url)
             logging.error(e)
@@ -149,16 +161,21 @@ def get_set_house(urls):
 
     max_workers = config.MAX_WORKERS
     houses = []
+    df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
+                 "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
+                 "Muebles y acabados", "Equipamiento e instalaciones", "Certificado energetico", "URL"])
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
         results = executor.map(get_houses, urls)
-        for url, house, e in results:
+        for url, house_item, e in results:
             if e is None:
-                houses.append(house)
+                #houses.append(house)
+                df = df.append(house_item, ignore_index=True)
             else:
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
-
-    write_csv(houses)
+    logging.info('HOUSE DATAFRAME --->' + df.to_string())
+    df.to_csv('houses_dataframe.csv')
+    #write_csv(houses)
     return;
 
 
@@ -172,7 +189,7 @@ def write_csv(houses):
 
 
 
-
+"""
 filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
 simple_date = datetime.now().strftime('%Y/%m/%d')
@@ -185,7 +202,7 @@ with open(filePath, 'w') as f:
         writer = csv.writer(f, dialect='myDialect')
         writer.writerow(first_row)
         f.close()
-
+"""
 
 
 
@@ -220,5 +237,5 @@ while continue_searching:
 
     if config.TEST_MODE:
         continue_searching = False
-    
 #sendResults()
+
