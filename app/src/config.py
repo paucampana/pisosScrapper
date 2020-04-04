@@ -4,6 +4,11 @@ from selenium.webdriver.chrome.options import Options
 URL_PISOS = "https://www.pisos.com"
 URL_PLACE = "/venta/pisos-esparreguera/"
 
+URL_LOG_IN = "https://www.pisos.com/Login"
+
+USER_PISOS = "informe.casas@gmail.com"
+PW_PISOS = "17InformeCasas"
+
 TEST_MODE = True
 
 MAX_WORKERS = 1
@@ -11,8 +16,8 @@ MAX_WORKERS = 1
 def get_Chrome_Options ():
     WINDOW_SIZE = "1920,1080"
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
+    #chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_experimental_option("prefs", {'profile.managed_default_content_settings.images':2})
     chrome_options.add_argument("--remote-debugin-port=9222")
