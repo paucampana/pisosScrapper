@@ -11,12 +11,13 @@ from datetime import datetime
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+
 import concurrent.futures
 import logging
 import time
 import pandas as pd
-
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def sendResults():
     try:
@@ -31,6 +32,7 @@ def sendResults():
                 logging.info("EMPTY CSV. NOT SENT")
 
     except Exception as e:
+        logging.error(e)
         logging.error("***EXCEPTION SENDING MAIL: " + type(e).__name__ + " ***")
 
 
@@ -43,7 +45,6 @@ def get_house_from_html_pisos(soup, url):
     mapHouse["Titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
     mapHouse["Zona"] = scraping.get_string_from_class(soup, "h2", 'position')
     mapHouse["Precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
-
     num_hab = ""
     num_bano = ""
     metro_q = ""
@@ -75,15 +76,16 @@ def get_house_from_html_pisos(soup, url):
         tags = caracteristica.find_all('li',{'class': 'charblock-element'})
         for tag in tags:
             info = tag.find_all('span')
-            kind = info[0].text
-            description = ""
-            if len(info) > 1:
-                description = info[1].text.replace(': ', '')
-            if first_element:
-                caracteristica_info += kind + ": " + description
-            else:
-                caracteristica_info += ", " + kind + ": " + description
-            first_element = False
+            if len(info) > 0:
+                kind = info[0].text
+                description = ""
+                if len(info) > 1:
+                    description = info[1].text.replace(': ', '')
+                if first_element:
+                    caracteristica_info += kind + ": " + description
+                else:
+                    caracteristica_info += ", " + kind + ": " + description
+                first_element = False
         if "Datos" in tipoCaracteristica:
             mapHouse['Caracteristicas'] = caracteristica_info
         if "Muebles" in tipoCaracteristica:
@@ -102,24 +104,22 @@ def get_house_from_html_pisos(soup, url):
                  "Muebles y acabados": mapHouse['muebles_i_acabados'], "Equipamiento e instalaciones":mapHouse['equipamiento_e_instalaciones'],
                  "Certificado energetico": mapHouse['certificado_energetico'],"URL": mapHouse['url']}]
     """
-    logging.info('HOUSE_ITEM')
-    logging.info(house_item)
+    #logging.info('HOUSE_ITEM')
+    #logging.info(house_item)
     return house_item;
 
 
 def get_houses(url):
-    refresh_retries = 1
+    refresh_retries = 2
     while(refresh_retries > 0):
         try:
             chrome_options = config.get_Chrome_Options()
             driver = webdriver.Chrome(options=chrome_options)
             driver.set_page_load_timeout(10)
             driver.get(url)
-
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             house_item = get_house_from_html_pisos(soup, url)
             driver.close() ##If all are closed, try with driver.close()
-            refresh_retries = 0
             return url, house_item, None
         except Exception as e:
             logging.error('EXCEPTION with url ' + url)
@@ -153,13 +153,14 @@ def like_house(url):
         refresh_retries = 0
         return None
     except Exception as e:
-        logging.error('EXCEPTION with url ' + url)
+        logging.error('EXCEPTION with LIKING url ' + url)
         logging.error(e)
         return e
 
 def get_set_house(urls):
 
-    max_workers = config.MAX_WORKERS
+    #max_workers = config.MAX_WORKERS
+    max_workers = 1
     houses = []
     df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
                  "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
@@ -171,6 +172,7 @@ def get_set_house(urls):
                 #houses.append(house)
                 df = df.append(house_item, ignore_index=True)
             else:
+                logging.error(e)
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
     logging.info('HOUSE DATAFRAME --->' + df.to_string())
@@ -225,7 +227,7 @@ while continue_searching:
         link = meta_tag.attrs['content']
         if link is not None:
             links.append(config.URL_PISOS + link)
-    logging.debug("found: " + str(len(links)) + " in page: " + str(page))
+    logging.info("found: " + str(len(links)) + " in page: " + str(page))
     if links == main_links:
         continue_searching = False
     if page == 1:
@@ -237,5 +239,4 @@ while continue_searching:
 
     if config.TEST_MODE:
         continue_searching = False
-#sendResults()
-
+sendResults()

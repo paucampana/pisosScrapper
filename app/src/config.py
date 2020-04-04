@@ -8,8 +8,10 @@ URL_LOG_IN = "https://www.pisos.com/Login"
 
 USER_PISOS = "informe.casas@gmail.com"
 PW_PISOS = "17InformeCasas"
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
 
-TEST_MODE = True
+TEST_MODE = False
 
 MAX_WORKERS = 1
 
