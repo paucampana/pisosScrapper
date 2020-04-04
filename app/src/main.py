@@ -34,14 +34,12 @@ def sendResults():
 
 def get_house_from_html_pisos(soup, url):
     #logging.debug(soup.encode('utf-8'))
-
-    titulo = scraping.get_string_from_class(soup, "h1", 'title')
-    logging.debug("titulo " + titulo)
-    zona = scraping.get_string_from_class(soup, "h2", 'position')
-    logging.debug("zona " + zona)
-    precio = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
-    logging.debug("precio " + precio)
-
+    mapHouse = {}
+    mapHouse["url"] = url
+    mapHouse["titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
+    mapHouse["zona"] = scraping.get_string_from_class(soup, "h2", 'position')
+    mapHouse["precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
+    
     num_hab = ""
     num_bano = ""
     metro_q = ""
@@ -49,39 +47,26 @@ def get_house_from_html_pisos(soup, url):
     divBasicDatas = basicData.findAll("div")
     for divBasicData in divBasicDatas:
         if divBasicData.find('div',attrs={'class':'icon-habitaciones'}) is not None:
-            num_hab = divBasicData.text.replace("habs", "")
+            mapHouse["num_hab"] = divBasicData.text.replace("habs", "")
         if divBasicData.find('div',attrs={'class':'icon-banyos'}) is not None:
-            num_bano = divBasicData.text.replace("baño", "")
+            mapHouse["num_bano"] = divBasicData.text.replace("baño", "")
         if divBasicData.find('div',attrs={'class':'icon-superficie'}) is not None:
-            metro_q = divBasicData.text.replace("m²", "")
+            mapHouse["metro_q"] = divBasicData.text.replace("m²", "")
         if divBasicData.find('div',attrs={'class':'icon-planta'}) is not None:
-            planta = divBasicData.text.split()[0]
+            mapHouse["planta"] = divBasicData.text.split()[0]
         if divBasicData.find('div',attrs={'class':'icon-eurmetro2'}) is not None:
-            precio_m = divBasicData.text.split()[0]
-    logging.debug("num_hab " + num_hab)
-    logging.debug("num_bano " + num_bano)
-    logging.debug("metro_q " + metro_q)
-    logging.debug("planta " + planta)
-    logging.debug("precio_m " + precio_m)
-
-
-    description = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
-    logging.debug("descripcion " + description)
+            mapHouse["precio_m"] = divBasicData.text.split()[0]
+    mapHouse["description"] = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
     antic_icon = soup.find('span',{'class' : 'icon-antiguedad'})
     if antic_icon is not None:
-        antic = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
-        logging.debug("antic " + antic)
+        mapHouse["antic"] = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     conservacion_icon = soup.find('span',{'class' : 'icon-estadoconservacion'})
     if conservacion_icon is not None:
-        conservacion = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
-        logging.debug("conservacion " + conservacion)
-
+        mapHouse["conservacion"] = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     caracteristicas = soup.find_all('div', {'class' : 'charblock'})
-    print(caracteristicas)
-
+    caracteristicas_info = ""
+    first_element = True
     for caracteristica in caracteristicas:
-        titol = caracteristica.find('h2', {'class': 'title'}).text
-        print(titol)
         tags = caracteristica.find_all('li',{'class': 'charblock-element'})
         for tag in tags:
             info = tag.find_all('span')
@@ -89,42 +74,22 @@ def get_house_from_html_pisos(soup, url):
             description = ""
             if len(info) > 1:
                 description = info[1].text.replace(': ', '')
-            print(kind + '--------' + description)
-    print('AAAAAAAAAAAA')
-    ## LOCATION
-    location_info = soup.find('div',attrs={'id':'location'})#.find('div',{'class':'subtitle'})
-    print('aa')
-    print(location_info)
-    print(soup)
-
-
-
-
-
-
-
-
-
-
-    num_planta = scraping.get_first_word(scraping.get_string_from_id(soup, "span", 'litFloor'))
-    contacto = scraping.get_string_from_class(soup, 'a', 'agency-microsite bold')
-    if contacto == "":
-        contacto = scraping.string_one_line(scraping.get_string_from_id(soup, "div", 'ctl00_ucInfoRequestGeneric_divAdvertisement'))
-    contacto_tel = scraping.get_input_value_from_id(soup, "input", 'hid_AdPhone')
-    if contacto_tel != "":
-        contacto_tel= contacto_tel.split(":")[-1]
-    contacto_extra = scraping.string_one_line(scraping.get_string_from_class_last(soup, "div", 'agency-contact-container'))
-    caracteristicas = scraping.get_all_elements_ul(soup, "ul", "detail-caracteristics--list")
-    extras = scraping.get_all_elements_ul(soup, "ul", "detail-extras")
-    referenciaFotocasa = scraping.get_last_string(scraping.get_string_from_id(soup, "div", "detailReference"))
-    images = scraping.get_all_elements_ul_by_id(soup, "ul", "containerSlider")
-
-
-    ubicacion = scraping.get_string_from_class_last(soup, "div", 'detail-section-content')
-    descripcion = scraping.delete_empty_lines(scraping.get_string_from_class(soup, "p", 'detail-description'))
-    res_house = House(titulo, zona, precio, num_hab, num_bano, metro_q, num_planta,
-                      contacto, contacto_tel, contacto_extra, caracteristicas, extras, ubicacion, descripcion, images, referenciaFotocasa, url)
-    return res_house;
+            if first_element:
+                caracteristicas_info += kind + ": " + description
+            else: 
+                caracteristicas_info += ", " + kind + ": " + description
+            first_element = False
+    mapHouse['caracteristicas'] = caracteristicas_info
+    # ## LOCATION
+    # location_info = soup.find('div',attrs={'id':'location'})#.find('div',{'class':'subtitle'})
+    # print('aa')
+    # print(location_info)
+    # #print(soup)
+    # print('............')
+    logging.debug(mapHouse)
+    
+    house = House(mapHouse)
+    return house;
 
 
 def get_houses(url):
@@ -183,9 +148,8 @@ simple_date = datetime.now().strftime('%Y/%m/%d')
 csv.register_dialect('myDialect',
 quoting=csv.QUOTE_ALL,
 skipinitialspace=True)
-first_row = ["Zona", "Precio (€/mes)", "Habitaciones", "Baños", "Metros cuadrados", "Planta",
-             "Ubicación", "Caracteristicas", "Extras", "Contacto", "Telefono", "Detalles contacto",
-             "Descripcion", "Imagenes",  "ref. Fotocasa","url"]
+first_row = ["Titulo", "Zona", "Precio", "Habitaciones", "Baños", "Metros quadrados",
+             "Planta", "Precio (€/m²)", "Description", "Estado conservacion", "Caracteristicas", "URL"]
 with open(filePath, 'w') as f:
         writer = csv.writer(f, dialect='myDialect')
         writer.writerow(first_row)
