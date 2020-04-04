@@ -11,6 +11,7 @@ from datetime import datetime
 from selenium.webdriver.chrome.options import Options
 import concurrent.futures
 import logging
+import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -39,7 +40,7 @@ def get_house_from_html_pisos(soup, url):
     mapHouse["titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
     mapHouse["zona"] = scraping.get_string_from_class(soup, "h2", 'position')
     mapHouse["precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
-    
+
     num_hab = ""
     num_bano = ""
     metro_q = ""
@@ -76,7 +77,7 @@ def get_house_from_html_pisos(soup, url):
                 description = info[1].text.replace(': ', '')
             if first_element:
                 caracteristicas_info += kind + ": " + description
-            else: 
+            else:
                 caracteristicas_info += ", " + kind + ": " + description
             first_element = False
     mapHouse['caracteristicas'] = caracteristicas_info
@@ -87,9 +88,15 @@ def get_house_from_html_pisos(soup, url):
     # #print(soup)
     # print('............')
     logging.debug(mapHouse)
-    
+    #house_item = pd.Series(mapHouse)
+    house_item = [{'Titulo': mapHouse['titulo'], 'Zona': mapHouse['zona'], 'Precio': mapHouse['precio'],
+                 'Habitaciones': mapHouse['num_hab'], 'Aseos': mapHouse['num_bano'], 'Metros cuadrados': mapHouse['metro_q'],
+                 "Planta": mapHouse['planta'], "Precio (€/m²)": mapHouse['precio_m'], "Description": mapHouse['description'],
+                 "Estado conservacion": mapHouse['conservacion'], "Caracteristicas": mapHouse['caracteristicas'], "URL": mapHouse['url']}]
+    logging.info('HOUSE_ITEM')
+    logging.info(house_item)
     house = House(mapHouse)
-    return house;
+    return house, house_item;
 
 
 def get_houses(url):
@@ -102,10 +109,10 @@ def get_houses(url):
             driver.get(url)
 
             soup = BeautifulSoup(driver.page_source, 'html.parser')
-            myhouse = get_house_from_html_pisos(soup, url)
+            myhouse, house_item = get_house_from_html_pisos(soup, url)
             driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
-            return url, myhouse, None
+            return url, myhouse, house_item, None
         except Exception as e:
             print('EXCEPTION')
             print(e)
@@ -118,15 +125,19 @@ def get_set_house(urls):
 
     max_workers = config.MAX_WORKERS
     houses = []
+    df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
+                 "Planta", "Precio (€/m²)", "Description", "Estado conservacion", "Caracteristicas", "URL"])
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
         results = executor.map(get_houses, urls)
-        for url, house, e in results:
+        for url, house, house_item, e in results:
             if e is None:
                 houses.append(house)
+                df = df.append(house_item, ignore_index=True)
             else:
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
-
+    logging.info('HOUSEE DATAFRAME --->' + df.to_string())
+    df.to_csv('out.csv')
     write_csv(houses)
     return;
 
