@@ -2,8 +2,9 @@
 Pràctica 1 de la UOC de l'assignatura Tipologia i cicle de vida de les dades.
 
 ## Membres del grup
-Pau Campaña Soler
-Edgar Ruben Pardo
+1. Pau Campaña Soler
+
+2. Edgar Ruben Pardo
 
 ## Descripció
 Aquest programa extreu informació de la web https://pisos.com. Per cada pis, extreu diferents atributs. El resultat de l'execució del programa és un fitxer CSV on tens tots els pisos de la zona que desitges analitzar. El programa et dóna l'opció d'enviar el CSV al correu que desitgis.
