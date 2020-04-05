@@ -18,22 +18,6 @@ import time
 import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
-def sendResults():
-    try:
-        with open(config.FILEPATH) as f:
-            csv_length = sum(1 for line in f)
-            logging.info("TOTAL FOUND: " + str(csv_length - 1))
-            if csv_length > 1:
-                subject = "INFORME DIA " + datetime.now().strftime('%Y/%m/%d')
-                to_email = ["pau.campanya.soler@gmail.com"]
-                sendMail.sendMail(subject, to_email)
-            else:
-                logging.info("EMPTY CSV. NOT SENT")
-
-
-
-
-
 def get_house_from_html_pisos(soup, url):
     #logging.debug(soup.encode('utf-8'))
     mapHouse = {}

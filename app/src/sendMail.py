@@ -10,7 +10,7 @@ import config
 
 def sendResults():
     try:
-        with open('houses_dataframe.csv') as f:
+        with open(config.FILEPATH) as f:
             csv_length = sum(1 for line in f)
             logging.info("TOTAL FOUND: " + str(csv_length - 1))
             if csv_length > 1:
