@@ -1,4 +1,3 @@
-from House import House
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import scraping
@@ -42,7 +41,7 @@ def get_house_from_html_pisos(soup, url):
     mapHouse["URL"] = url
     mapHouse["Titulo"] = scraping.get_string_from_class(soup, "h1", 'title')
     mapHouse["Zona"] = scraping.get_string_from_class(soup, "h2", 'position')
-    mapHouse["Precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "")
+    mapHouse["Precio"] = scraping.get_string_from_class(soup, "span", 'h1 jsPrecioH1').replace("€", "").replace(".", "")
 
     num_hab = ""
     num_bano = ""
@@ -51,7 +50,7 @@ def get_house_from_html_pisos(soup, url):
     divBasicDatas = basicData.findAll("div")
     for divBasicData in divBasicDatas:
         if divBasicData.find('div',attrs={'class':'icon-habitaciones'}) is not None:
-            mapHouse["Habitaciones"] = divBasicData.text.replace("habs", "")
+            mapHouse["Habitaciones"] = divBasicData.text.replace("habs", "").strip()
         if divBasicData.find('div',attrs={'class':'icon-banyos'}) is not None:
             mapHouse["Aseos"] = divBasicData.text.replace("baño", "")
         if divBasicData.find('div',attrs={'class':'icon-superficie'}) is not None:
@@ -92,20 +91,26 @@ def get_house_from_html_pisos(soup, url):
             mapHouse['Equipamiento e instalaciones'] = caracteristica_info
         if "Certificado" in tipoCaracteristica:
             mapHouse['Certificado energetico'] = caracteristica_info
-    #house = House(mapHouse)
     house_item = pd.Series(mapHouse)
-    """
-    house_item = [{'Titulo': mapHouse['titulo'], 'Zona': mapHouse['zona'], 'Precio': mapHouse['precio'],
-                 'Habitaciones': mapHouse['num_hab'], 'Aseos': mapHouse['num_bano'], 'Metros cuadrados': mapHouse['metro_q'],
-                 "Planta": mapHouse['planta'], "Precio (€/m²)": mapHouse['precio_m'], "Description": mapHouse['description'],
-                 "Estado conservacion": mapHouse['conservacion'], "Caracteristicas": mapHouse['caracteristicas'],
-                 "Muebles y acabados": mapHouse['muebles_i_acabados'], "Equipamiento e instalaciones":mapHouse['equipamiento_e_instalaciones'],
-                 "Certificado energetico": mapHouse['certificado_energetico'],"URL": mapHouse['url']}]
-    """
-    logging.info('HOUSE_ITEM')
-    logging.info(house_item)
     return house_item;
 
+
+def is_house_favorite(house_item):
+    m2 = house_item["Metros cuadrados"]
+    precio = house_item["Precio"]
+    habitaciones = house_item["Habitaciones"]
+    if m2 == "" or precio == "" or habitaciones == "":
+        logging.debug("Some parameters are empty. Not a favorite house candidate")
+        return False
+    try:
+        if (int(m2) >= 80 and int(precio) <= 120000 and int(habitaciones) >= 3):
+            logging.debug("Is a favorite house candidate")
+            return True
+        else: 
+            logging.debug("It is not a  favorite house candidate")
+    except Exception as e:
+        logging.debug("Some parameters can not be converted to integer. Not a favorite house candidate")
+        return False
 
 def get_houses(url):
     refresh_retries = 1
@@ -118,6 +123,8 @@ def get_houses(url):
 
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             house_item = get_house_from_html_pisos(soup, url)
+            if is_house_favorite(house_item):
+                like_house(url)
             driver.close() ##If all are closed, try with driver.close()
             refresh_retries = 0
             return url, house_item, None
@@ -143,7 +150,6 @@ def like_house(url):
         driver.get(url)
         time.sleep(5)
         button_fav = driver.find_element_by_id("dvGuardarFavoritos").get_attribute("class")
-        print(button_fav)
         if button_fav == "icon icon-fav selected":
             logging.debug("already liked. Doing nothing")
         else:
@@ -188,31 +194,9 @@ def write_csv(houses):
     return;
 
 
-
-"""
-filePath = "excels/" + datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
-fileName = datetime.now().strftime('%Y-%m-%d--%H-%M-%S') + ".csv"
-simple_date = datetime.now().strftime('%Y/%m/%d')
-csv.register_dialect('myDialect',
-quoting=csv.QUOTE_ALL,
-skipinitialspace=True)
-first_row = ["Titulo", "Zona", "Precio", "Habitaciones", "Baños", "Metros quadrados",
-             "Planta", "Precio (€/m²)", "Description", "Estado conservacion", "Caracteristicas", "URL"]
-with open(filePath, 'w') as f:
-        writer = csv.writer(f, dialect='myDialect')
-        writer.writerow(first_row)
-        f.close()
-"""
-
-
-
-
-
 page = 1
 continue_searching = True
 main_links =  [] ## avoid being redirected to first page
-
-like_house("https://www.pisos.com/comprar/piso-esparreguera_centro_urbano-97582198372_519327")
 
 while continue_searching:
     links = []
