@@ -5,6 +5,9 @@ from email.mime.text import MIMEText
 from email.utils import COMMASPACE
 from email import encoders
 import config
+from datetime import datetime
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 

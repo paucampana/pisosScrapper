@@ -14,7 +14,7 @@ FILEPATH  = './excels/houses_dataframe.csv'
 MAIL_TO_SEND = "informe.casas@gmail.com"
 TEST_MODE = False
 
-MAX_WORKERS = 5
+MAX_WORKERS = 1
 
 def get_Chrome_Options ():
     WINDOW_SIZE = "1920,1080"
