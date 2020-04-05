@@ -18,21 +18,7 @@ import time
 import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
-def sendResults():
-    try:
-        with open('houses_dataframe.csv') as f:
-            csv_length = sum(1 for line in f)
-            logging.info("TOTAL FOUND: " + str(csv_length - 1))
-            if csv_length > 1:
-                subject = "INFORME DIA " + datetime.now().strftime('%Y/%m/%d')
-                to_email = ["pau.campanya.soler@gmail.com"]
-                sendMail.sendMail(subject, to_email)
-            else:
-                logging.info("EMPTY CSV. NOT SENT")
 
-    except Exception as e:
-        logging.error(e)
-        logging.error("***EXCEPTION SENDING MAIL: " + type(e).__name__ + " ***")
 
 
 
@@ -165,8 +151,7 @@ def like_house(url):
 
 def get_set_house(urls):
 
-    #max_workers = config.MAX_WORKERS
-    max_workers = 1
+    max_workers = config.MAX_WORKERS
     houses = []
     df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
                  "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
@@ -175,7 +160,6 @@ def get_set_house(urls):
         results = executor.map(get_houses, urls)
         for url, house_item, e in results:
             if e is None:
-                #houses.append(house)
                 df = df.append(house_item, ignore_index=True)
             else:
                 logging.error(e)
@@ -183,16 +167,6 @@ def get_set_house(urls):
 
     logging.info('HOUSE DATAFRAME --->' + df.to_string())
     df.to_csv('houses_dataframe.csv')
-    #write_csv(houses)
-    return;
-
-
-def write_csv(houses):
-    with open(filePath, 'a') as f:
-        writer = csv.writer(f, dialect='myDialect')
-        for house in houses:
-            writer.writerow(house.getDataAsList())
-    f.close()
     return;
 
 
@@ -223,4 +197,4 @@ while continue_searching:
 
     if config.TEST_MODE:
         continue_searching = False
-sendResults()
+sendMail.sendResults()

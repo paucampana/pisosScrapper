@@ -11,9 +11,11 @@ PW_PISOS = "17InformeCasas"
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
+MAIL_TO_SEND = "informe.casas@gmail.com"
+
 TEST_MODE = False
 
-MAX_WORKERS = 1
+MAX_WORKERS = 5
 
 def get_Chrome_Options ():
     WINDOW_SIZE = "1920,1080"
