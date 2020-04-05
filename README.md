@@ -54,6 +54,8 @@ Hi ha diferents paramentres que es poden configurar des del fitxer `app/src/conf
 | URL_LOG_IN | https://www.pisos.com/Login |   Url de la pàgina per fer log in |
 | USER_PISOS |  informe.casas@gmail.com | Nom de l'usuari amb el que es vol fer log in a pisos.com |
 | PW_PISOS |    XXXXXX   |   Contrassenya de l'usuari amb el que es vol fer log in a pisos.com |
+| USER_MAIL |  informe.casas@gmail.com | Nom de l'usuari amb el que es vol fer log al compte de correu |
+| PW_MAIL |    XXXXXX   |   Contrassenya de l'usuari amb el que es vol fer log al compte de correu |
 | SMTP_SERVER | smtp.gmail.com |    Servidor per enviar el correu |
 | SMTP_PORT |  587 | Port del servidor per enviar el correu |
 | MAIL_TO_SEND |    informe.casas@gmail.com   |   Correu on es vol enviar el fitxer CSV |
