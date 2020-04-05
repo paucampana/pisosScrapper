@@ -6,7 +6,7 @@ from email.utils import COMMASPACE
 from email import encoders
 import config
 
-FILEPATH = './houses_dataframe.csv'
+
 
 
 def sendMail(subject, to_email):
@@ -16,7 +16,7 @@ def sendMail(subject, to_email):
     msg['Subject'] = subject
 
     part = MIMEBase('application', "octet-stream")
-    part.set_payload(open(FILEPATH, "rb").read())
+    part.set_payload(open(config.FILEPATH, "rb").read())
     encoders.encode_base64(part)
     part.add_header('Content-Disposition', 'attachment', filename='Houses_dataframe.csv')
     msg.attach(part)

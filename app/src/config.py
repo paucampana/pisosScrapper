@@ -10,7 +10,7 @@ USER_PISOS = "informe.casas@gmail.com"
 PW_PISOS = "17InformeCasas"
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-
+FILEPATH  = './excels/houses_dataframe.csv'
 TEST_MODE = False
 
 MAX_WORKERS = 1

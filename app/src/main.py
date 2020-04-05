@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 def sendResults():
     try:
-        with open('houses_dataframe.csv') as f:
+        with open(config.FILEPATH) as f:
             csv_length = sum(1 for line in f)
             logging.info("TOTAL FOUND: " + str(csv_length - 1))
             if csv_length > 1:
@@ -157,14 +157,11 @@ def like_house(url):
         logging.error(e)
         return e
 
-def get_set_house(urls):
+def get_set_house(urls,df):
 
-    #max_workers = config.MAX_WORKERS
-    max_workers = 1
+    max_workers = config.MAX_WORKERS
+    #max_workers = 5
     houses = []
-    df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
-                 "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
-                 "Muebles y acabados", "Equipamiento e instalaciones", "Certificado energetico", "URL"])
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
         results = executor.map(get_houses, urls)
         for url, house_item, e in results:
@@ -175,8 +172,6 @@ def get_set_house(urls):
                 logging.error(e)
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
-    logging.info('HOUSE DATAFRAME --->' + df.to_string())
-    df.to_csv('houses_dataframe.csv')
     #write_csv(houses)
     return;
 
@@ -215,7 +210,9 @@ continue_searching = True
 main_links =  [] ## avoid being redirected to first page
 
 like_house("https://www.pisos.com/comprar/piso-esparreguera_centro_urbano-97582198372_519327")
-
+df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
+             "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
+             "Muebles y acabados", "Equipamiento e instalaciones", "Certificado energetico", "URL"])
 while continue_searching:
     links = []
     r  = requests.get(config.URL_PISOS + config.URL_PLACE + str(page))
@@ -234,9 +231,10 @@ while continue_searching:
         main_links = links
     if config.TEST_MODE:
         links = [links[1]]
-    get_set_house(links)
+    get_set_house(links,df)
     page += 1;
 
     if config.TEST_MODE:
         continue_searching = False
+df.to_csv(config.FILEPATH)
 sendResults()
