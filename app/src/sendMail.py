@@ -8,6 +8,22 @@ import config
 
 
 
+def sendResults():
+    try:
+        with open('houses_dataframe.csv') as f:
+            csv_length = sum(1 for line in f)
+            logging.info("TOTAL FOUND: " + str(csv_length - 1))
+            if csv_length > 1:
+                subject = "INFORME DIA " + datetime.now().strftime('%Y/%m/%d')
+                to_email = [config.MAIL_TO_SEND]
+                sendMail(subject, to_email)
+            else:
+                logging.info("EMPTY CSV. NOT SENT")
+
+    except Exception as e:
+        logging.error(e)
+        logging.error("***EXCEPTION SENDING MAIL: " + type(e).__name__ + " ***")
+
 
 def sendMail(subject, to_email):
     msg = MIMEMultipart()
