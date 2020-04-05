@@ -30,7 +30,7 @@ def get_set_house(urls):
                 logging.error(e)
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
-    logging.info('HOUSE DATAFRAME --->' + subset_df.to_string())
+    logging.info('House dataframe --->' + subset_df.to_string())
     return subset_df;
 
 
@@ -67,6 +67,6 @@ while continue_searching:
 
     if config.TEST_MODE:
         continue_searching = False
-logging.info('AAAAAAAAAAAAAAAAAAAAA')
+logging.info('Finish webscrapping proces. Creating CSV')
 df.to_csv(config.FILEPATH)
 sendMail.sendResults()

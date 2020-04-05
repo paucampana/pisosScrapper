@@ -30,7 +30,7 @@ def sendResults():
 
 def sendMail(subject, to_email):
     msg = MIMEMultipart()
-    msg['From'] = config.USER_PISOS
+    msg['From'] = config.USER_MAIL
     msg['To'] = COMMASPACE.join(to_email)
     msg['Subject'] = subject
 
@@ -43,6 +43,6 @@ def sendMail(subject, to_email):
     smtpObj = smtplib.SMTP(config.SMTP_SERVER, config.SMTP_PORT)
     smtpObj.ehlo()
     smtpObj.starttls()
-    smtpObj.login(config.USER_PISOS, config.PW_PISOS)
+    smtpObj.login(config.USER_MAIL, config.PW_MAIL)
     smtpObj.sendmail(msg['From'], msg['To'], msg.as_string())
     smtpObj.quit()
