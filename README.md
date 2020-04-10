@@ -1,4 +1,4 @@
-# Pisos Scrapper
+# Pisos Scraper
 Pràctica 1 de la UOC de l'assignatura M2.951 - Tipologia i cicle de vida de les dades.
 
 ## Membres del grup
