@@ -8,6 +8,8 @@ URL_LOG_IN = "https://www.pisos.com/Login"
 
 USER_PISOS = "informe.casas@gmail.com"
 PW_PISOS = "17InformeCasas"
+USER_MAIL = "informe.casas@gmail.com"
+PW_MAIL = "17InformeCasas"
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 FILEPATH  = './excels/houses_dataframe.csv'
