@@ -6,10 +6,6 @@ Pràctica 1 de la UOC de l'assignatura M2.951 - Tipologia i cicle de vida de les
 
 2. Edgar Ruben Pardo
 
-## Llicència
-
-[CC BY-NC-SA 4.0 License](https://github.com/paucampana/pisosScrapper/blob/master/LICENSE.md)
-
 ## Descripció
 Aquest programa extreu informació de la web https://pisos.com. Per cada pis, extreu diferents atributs. El resultat de l'execució del programa és un fitxer CSV on tens tots els pisos de la zona que desitges analitzar. El programa et dóna l'opció d'enviar el CSV al correu que desitgis.
 
@@ -50,3 +46,16 @@ docker run pisos
 ## Parametrització del script
 
 Hi ha diferents paràmetres  configurables que permeten modificar el comportament de l'execució. Aquests, es poden parametritzar des del fitxer `app/src/config.py`. Més informació a la [Wiki](https://github.com/paucampana/pisosScrapper/wiki).
+
+## Llicència
+
+Shield: [![CC BY-NC-ND 4.0][cc-by-shield]][cc-by]
+
+This work is licensed under a [Creative Commons Attribution 4.0 International
+License][cc-by].
+
+[![CC BY-NC-ND 4.0][cc-by-image]][cc-by]
+
+[cc-by]: https://creativecommons.org/licenses/by-nc-nd/4.0/
+[cc-by-image]: https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-black
