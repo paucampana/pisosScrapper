@@ -6,6 +6,10 @@ Pràctica 1 de la UOC de l'assignatura M2.951 - Tipologia i cicle de vida de les
 
 2. Edgar Ruben Pardo
 
+## DOI
+
+El DOI del dataset es pot trobar a [Zenodo](https://doi.org/10.5281/zenodo.3747580)
+
 ## Descripció
 Aquest programa extreu informació de la web https://pisos.com. Per cada pis, extreu diferents atributs. El resultat de l'execució del programa és un fitxer CSV on tens tots els pisos de la zona que desitges analitzar. El programa et dóna l'opció d'enviar el CSV al correu que desitgis.
 
