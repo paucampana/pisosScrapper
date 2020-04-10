@@ -8,7 +8,7 @@ Pràctica 1 de la UOC de l'assignatura M2.951 - Tipologia i cicle de vida de les
 
 ## License
 
-[CC BY-NC-SA 4.0 License] https://github.com/paucampana/pisosScrapper/blob/master/LICENSE
+[CC BY-NC-SA 4.0 License](https://github.com/paucampana/pisosScrapper/blob/master/LICENSE)
 
 ## Descripció
 Aquest programa extreu informació de la web https://pisos.com. Per cada pis, extreu diferents atributs. El resultat de l'execució del programa és un fitxer CSV on tens tots els pisos de la zona que desitges analitzar. El programa et dóna l'opció d'enviar el CSV al correu que desitgis.
