@@ -6,7 +6,7 @@ Pràctica 1 de la UOC de l'assignatura M2.951 - Tipologia i cicle de vida de les
 
 2. Edgar Ruben Pardo
 
-## Licència
+## Llicència
 
 [CC BY-NC-SA 4.0 License](https://github.com/paucampana/pisosScrapper/blob/master/LICENSE.md)
 
