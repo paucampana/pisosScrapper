@@ -12,7 +12,7 @@ Aquest programa extreu informació de la web https://pisos.com. Per cada pis, ex
 ## Com executar el programa
 Tens dos opcions per executar el programa: 
 ### Executar-ho localment
-Requisits: Cal tenir instalat python3, pip3, selenium y chromedriver.
+Requisits: Cal tenir instal·lat python3, pip3, selenium y chromedriver.
 Els passos per executar el programa són:
 1. Per terminal, instalar els requirements: 
 ```
@@ -29,16 +29,16 @@ cd src
 python3 main.py
 ```
 
-Els resultats de l'execució del programa estaràn disponibles dins la carpeta `app/excels`
+Els resultats de l'execució del programa estaran disponibles dins la carpeta `app/excels`
 
 ### Utilitzant Docker
-Requisits: Cal tenir instalat docker.
+Requisits: Cal tenir instal·lat docker.
 Els passos per executar el programa són:
 1. Construir la imatge:
 ```
 docker image build . --tag pisos
 ```
-2. Un cop esta construida, executar el contenidor:
+2. Un cop esta construïda, executar el contenidor:
 ```
 docker run pisos
 ```
