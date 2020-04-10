@@ -15,7 +15,9 @@ Aquest programa extreu informació de la web https://pisos.com. Per cada pis, ex
 
 ## Entrega Pràctica 1
 
-En el següent fitxer [PDF](https://github.com/paucampana/pisosScrapper/blob/master/Pr%C3%A0ctica%201.pdf) es troben les respostes a les preguntes plantejades a la Pràctica 1. Tota la informació del projecte es troba a la [wiki](https://github.com/paucampana/pisosScrapper/wiki) del projecte.  
+En el següent fitxer [PDF](https://github.com/paucampana/pisosScrapper/blob/master/Pr%C3%A0ctica%201.pdf) es troben les respostes a les preguntes plantejades a la Pràctica 1. 
+
+Tota la informació del projecte es troba a la [wiki](https://github.com/paucampana/pisosScrapper/wiki) del projecte.  
 
 ## Llicència
 
