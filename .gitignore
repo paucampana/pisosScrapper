@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+app/src/__pycache__
 
 # exclude config
 app/src/privateConfig.py
