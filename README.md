@@ -11,8 +11,8 @@ Aquest programa extreu informació de la web https://pisos.com. Per cada pis, ex
 
 ## Com executar el programa
 Tens dos opcions per executar el programa: 
-### Executar-ho directament
-Requisits: Fa falta tenir instalat python3, pip3, selenium y chromedriver.
+### Executar-ho localment
+Requisits: Cal tenir instalat python3, pip3, selenium y chromedriver.
 Els passos per executar el programa són:
 1. Per terminal, instalar els requirements: 
 ```
@@ -32,7 +32,7 @@ python3 main.py
 Els resultats de l'execució del programa estaràn disponibles dins la carpeta `app/excels`
 
 ### Utilitzant Docker
-Requisits: Fa falta tenir instalat docker.
+Requisits: Cal tenir instalat docker.
 Els passos per executar el programa són:
 1. Construir la imatge:
 ```
@@ -45,19 +45,4 @@ docker run pisos
 
 ## Parametres que es poden configurar
 
-Hi ha diferents paramentres que es poden configurar des del fitxer `app/src/config.py`:
-
-| Atribut   |      Valor per defecte      |  Descripció |
-|----------|:-------------:|------:|
-| URL_PISOS |  https://www.pisos.com | Url de la web que es vol fer webscrapping (No s'hauria de modificar) |
-| URL_PLACE |    /venta/pisos-esparreguera/   |   Zona de la qual es vol fer l'estudi |
-| URL_LOG_IN | https://www.pisos.com/Login |   Url de la pàgina per fer log in |
-| USER_PISOS |  informe.casas@gmail.com | Nom de l'usuari amb el que es vol fer log in a pisos.com |
-| PW_PISOS |    XXXXXX   |   Contrassenya de l'usuari amb el que es vol fer log in a pisos.com |
-| USER_MAIL |  informe.casas@gmail.com | Nom de l'usuari amb el que es vol fer log al compte de correu |
-| PW_MAIL |    XXXXXX   |   Contrassenya de l'usuari amb el que es vol fer log al compte de correu |
-| SMTP_SERVER | smtp.gmail.com |    Servidor per enviar el correu |
-| SMTP_PORT |  587 | Port del servidor per enviar el correu |
-| MAIL_TO_SEND |    informe.casas@gmail.com   |   Correu on es vol enviar el fitxer CSV |
-| TEST_MODE | False |  Atribut per fer tests. En el cas de que nomes es vulgui es fer l'estudi d'un sol pis, posar valor a True  |
-| MAX_WORKERS |  1 | Número de workers per fer el webscrapping dels pisos. Ho fa de manera paral·lela |
+Hi ha diferents paràmetres  configurables que permeten modificar el comportament de l'execució. Aquests, es poden parametritzar des del fitxer `app/src/config.py`. [Wiki] (https://github.com/paucampana/pisosScrapper/wiki)
