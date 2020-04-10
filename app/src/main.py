@@ -1,24 +1,19 @@
 from bs4 import BeautifulSoup
+
 import sendMail
 import Houses
 import requests
 import config
-import privateConfig
-import csv
-
-
-
 import concurrent.futures
 import logging
-import time
+import numpy as np
 import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
 
 def get_set_house(urls):
     subset_df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
-                 "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
-                 "Muebles y acabados", "Equipamiento e instalaciones", "Certificado energetico", "URL"])
+                 "Planta", "Precio (€/m²)", "Antigüedad", "Estado conservacion", "URL", "Descripcion"])
     max_workers = config.MAX_WORKERS
     houses = []
     with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
@@ -30,7 +25,7 @@ def get_set_house(urls):
                 logging.error(e)
                 logging.error("***NOT ADDED. CHECK: " + url + " *** EXCEPTION: " + type(e).__name__ )
 
-    logging.info('HOUSE DATAFRAME --->' + subset_df.to_string())
+    logging.debug('HOUSE DATAFRAME --->' + subset_df.to_string())
     return subset_df;
 
 
@@ -41,8 +36,7 @@ main_links =  [] ## avoid being redirected to pisos.com first page
 
 #like_house("https://www.pisos.com/comprar/piso-esparreguera_centro_urbano-97582198372_519327")
 df = pd.DataFrame(columns=["Titulo", "Zona", "Precio", "Habitaciones", "Aseos", "Metros cuadrados",
-             "Planta", "Precio (€/m²)", "Description", "Antigüedad", "Estado conservacion", "Caracteristicas",
-             "Muebles y acabados", "Equipamiento e instalaciones", "Certificado energetico", "URL"])
+             "Planta", "Precio (€/m²)", "Antigüedad", "Estado conservacion", "URL", "Descripcion"])
 while continue_searching:
     links = []
     r  = requests.get(config.URL_PISOS + config.URL_PLACE + str(page))
@@ -61,12 +55,12 @@ while continue_searching:
         main_links = links
     if config.TEST_MODE:
         links = [links[1]]
+        continue_searching = False
     subset_df = get_set_house(links)
     df = df.append(subset_df)
     page += 1;
 
-    if config.TEST_MODE:
-        continue_searching = False
-logging.info('AAAAAAAAAAAAAAAAAAAAA')
-df.to_csv(config.FILEPATH)
+
+df = df.replace(np.nan, '-', regex=True)
+df.to_csv(config.FILEPATH, index=False)
 sendMail.sendResults()

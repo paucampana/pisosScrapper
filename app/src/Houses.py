@@ -1,12 +1,14 @@
 from bs4 import BeautifulSoup
-import scraping
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+import scraping
 import config
 import logging
 import pandas as pd
+import time
 logging.basicConfig(level=logging.INFO)
 
 
@@ -26,14 +28,14 @@ def get_house_from_html_pisos(soup, url):
         if divBasicData.find('div',attrs={'class':'icon-habitaciones'}) is not None:
             mapHouse["Habitaciones"] = divBasicData.text.replace("habs", "").strip()
         if divBasicData.find('div',attrs={'class':'icon-banyos'}) is not None:
-            mapHouse["Aseos"] = divBasicData.text.replace("baño", "")
+            mapHouse["Aseos"] = divBasicData.text.replace("baño", "").replace("s","")
         if divBasicData.find('div',attrs={'class':'icon-superficie'}) is not None:
             mapHouse["Metros cuadrados"] = divBasicData.text.replace("m²", "")
         if divBasicData.find('div',attrs={'class':'icon-planta'}) is not None:
             mapHouse["Planta"] = divBasicData.text.split()[0]
         if divBasicData.find('div',attrs={'class':'icon-eurmetro2'}) is not None:
             mapHouse["Precio (€/m²)"] = divBasicData.text.split()[0]
-    mapHouse["Description"] = soup.find('div',{"id":"descriptionBody"}).text.lstrip()
+    mapHouse["Descripcion"] = soup.find('div',{"id":"descriptionBody"}).text.strip().replace("\n"," ")
     antic_icon = soup.find('span',{'class' : 'icon-antiguedad'})
     if antic_icon is not None:
         mapHouse["Antigüedad"] = antic_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
@@ -41,6 +43,7 @@ def get_house_from_html_pisos(soup, url):
     if conservacion_icon is not None:
         mapHouse["Estado conservacion"] = conservacion_icon.find_parent('li').find_all('span')[1].text.replace(': ', '')
     caracteristicas = soup.find_all('div', {'class' : 'charblock'})
+    """
     for caracteristica in caracteristicas:
         first_element = True
         caracteristica_info = ""
@@ -66,6 +69,7 @@ def get_house_from_html_pisos(soup, url):
             mapHouse['Equipamiento e instalaciones'] = caracteristica_info
         if "Certificado" in tipoCaracteristica:
             mapHouse['Certificado energetico'] = caracteristica_info
+    """
     house_item = pd.Series(mapHouse)
     return house_item;
 
