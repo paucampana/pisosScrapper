@@ -45,4 +45,4 @@ docker run pisos
 
 ## Parametres que es poden configurar
 
-Hi ha diferents paràmetres  configurables que permeten modificar el comportament de l'execució. Aquests, es poden parametritzar des del fitxer `app/src/config.py`. [Wiki] (https://github.com/paucampana/pisosScrapper/wiki)
+Hi ha diferents paràmetres  configurables que permeten modificar el comportament de l'execució. Aquests, es poden parametritzar des del fitxer `app/src/config.py`. Més informació a la [Wiki](https://github.com/paucampana/pisosScrapper/wiki)
