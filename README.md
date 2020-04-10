@@ -13,43 +13,9 @@ El DOI del dataset es pot trobar a [Zenodo](https://doi.org/10.5281/zenodo.37475
 ## Descripció
 Aquest programa extreu informació de la web https://pisos.com. Per cada pis, extreu diferents atributs. El resultat de l'execució del programa és un fitxer CSV on tens tots els pisos de la zona que desitges analitzar. El programa et dóna l'opció d'enviar el CSV al correu que desitgis.
 
-## Com executar el programa
-Tens dos opcions per executar el programa: 
-### Executar-ho localment
-Requisits: Cal tenir instal·lat python3, pip3, selenium y chromedriver.
-Els passos per executar el programa són:
-1. Per terminal, instalar els requirements: 
-```
-cd app
-pip3 install -r requirements
-```
-2. Instalar pandas:
-```
-pip3 install pandas
-```
-3. Executar el programa:
-```
-cd src
-python3 main.py
-```
+## Entrega Pràctica 1
 
-Els resultats de l'execució del programa estaran disponibles dins la carpeta `app/excels`
-
-### Utilitzant Docker
-Requisits: Cal tenir instal·lat docker.
-Els passos per executar el programa són:
-1. Construir la imatge:
-```
-docker image build . --tag pisos
-```
-2. Un cop esta construïda, executar el contenidor:
-```
-docker run pisos
-```
-
-## Parametrització del script
-
-Hi ha diferents paràmetres  configurables que permeten modificar el comportament de l'execució. Aquests, es poden parametritzar des del fitxer `app/src/config.py`. Més informació a la [Wiki](https://github.com/paucampana/pisosScrapper/wiki).
+En el següent fitxer [PDF](https://github.com/paucampana/pisosScrapper/blob/master/Pr%C3%A0ctica%201.pdf) es troben les respostes a les preguntes plantejades a la Pràctica 1.
 
 ## Llicència
 
